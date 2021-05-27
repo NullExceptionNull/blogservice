@@ -47,3 +47,10 @@ func NewEngine(d *setting.DataBaseSettingS) (*gorm.DB, error) {
 	}
 	return db, nil
 }
+
+func (model *Model) BeforeCreate(db *gorm.DB) {
+	if model.CreatedOn == 0 {
+		model.CreatedOn = uint32(time.Now().Unix())
+	}
+	return
+}
