@@ -17,25 +17,23 @@ func (t *Tag) List(c *gin.Context) {
 	params := service.ListTagReq{}
 	err := c.ShouldBind(&params)
 	if err != nil {
-		app.NewResponse(c).ToErrorResponse(errcode.InvalidParams)
+		app.NewResponse(c).ToErrorResponse(errcode.InvalidParams.WithDetails(err.Error()))
+		return
 	}
 	pager := app.Pager{Page: app.GetPage(c), PageSize: app.GetPageSize(c)}
-
 	//get count
 	count, err := s.CountTag(&service.CountTagReq{Name: params.Name, State: params.State})
 
 	if err != nil {
-		app.NewResponse(c).ToErrorResponse(errcode.ServerError)
+		app.NewResponse(c).ToErrorResponse(errcode.ErrorGetTagListFail)
+		return
 	}
-
 	list, err := s.ListTag(&params, pager)
-
 	if err != nil {
 		app.NewResponse(c).ToErrorResponse(errcode.ServerError)
+		return
 	}
-
 	app.NewResponse(c).ToResponseList(list, count)
-
 	return
 }
 
@@ -44,7 +42,8 @@ func (t *Tag) Create(c *gin.Context) {
 	req := service.CreateTagReq{}
 	err := c.ShouldBindJSON(&req)
 	if err != nil {
-		app.NewResponse(c).ToErrorResponse(errcode.InvalidParams)
+		app.NewResponse(c).ToErrorResponse(errcode.ErrorCreateTagtFail)
+		return
 	}
 	s.CreateTag(&req)
 }
