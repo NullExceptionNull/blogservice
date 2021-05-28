@@ -13,12 +13,12 @@ type CreateTagReq struct {
 
 type ListTagReq struct {
 	Name  string `form:"name"`
-	State uint8  `form:"State,default=1"`
+	State uint8  `form:"state,default=1"`
 }
 
 type CountTagReq struct {
 	Name  string `form:"name"`
-	State uint8  `form:"State,default=1"`
+	State uint8  `form:"state,default=1"`
 }
 
 func (svr *Service) CreateTag(param *CreateTagReq) {
