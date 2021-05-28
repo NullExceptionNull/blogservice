@@ -14,12 +14,13 @@ func (Tag) TableName() string {
 
 func (t Tag) Count(db *gorm.DB) (int, error) {
 	var count int64
+	model := db.Model(&t)
 	if t.Name != "" {
-		db = db.Where("name = ?", t.Name)
+		model = model.Where("name = ?", t.Name)
 	}
-	db.Where("state = ?", t.State)
+	model.Where("state = ?", t.State)
 
-	if err := db.Model(&t).Where("is_del = ?", 0).Count(&count).Error; err != nil {
+	if err := model.Where("is_del = ?", 0).Count(&count).Error; err != nil {
 		return 0, err
 	}
 	return int(count), nil
@@ -29,15 +30,18 @@ func (t Tag) List(db *gorm.DB, pageOffset, pageSize int) ([]*Tag, error) {
 	var tags []*Tag
 	var err error
 
-	if pageOffset > 0 && pageSize > 0 {
-		db = db.Offset(pageOffset).Limit(pageSize)
-	}
-	if t.Name != "" {
-		db = db.Where("name = ?", t.Name)
-	}
-	db.Where("state = ?", t.State)
+	model := db.Model(&t)
 
-	if err = db.Model(&t).Where("is_del = ?", 0).Find(&tags).Error; err != nil {
+	model = model.Offset(pageOffset).Limit(pageSize)
+
+	//if pageOffset > 0{
+	//}
+	if t.Name != "" {
+		model = model.Where("name = ?", t.Name)
+	}
+	model.Where("state = ?", t.State)
+
+	if err = model.Where("is_del = ?", 0).Find(&tags).Error; err != nil {
 		return nil, err
 	}
 	return tags, nil
