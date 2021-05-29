@@ -3,12 +3,13 @@ package model
 import (
 	"blog-service/pkg/setting"
 	"fmt"
-	"gorm.io/driver/mysql"
-	"gorm.io/gorm"
-	"gorm.io/gorm/logger"
 	"log"
 	"os"
 	"time"
+
+	"gorm.io/driver/mysql"
+	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 )
 
 type Model struct {
@@ -34,13 +35,13 @@ func NewEngine(d *setting.DataBaseSettingS) (*gorm.DB, error) {
 		},
 	)
 
-	db, err := gorm.Open(mysql.Open(s), &gorm.Config{
+	db, _ := gorm.Open(mysql.Open(s), &gorm.Config{
 		Logger: newLogger,
 	})
 
 	sqlDb, _ := db.DB()
 
-	err = sqlDb.Ping()
+	err := sqlDb.Ping()
 
 	if err != nil {
 		return nil, err

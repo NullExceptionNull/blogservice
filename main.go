@@ -29,9 +29,11 @@ func init() {
 
 	setUpLog()
 
-	err := settingUp()
+	c, err := settingUp()
 
 	err = setUpDbEngine()
+
+	SetUpNacos(c)
 
 	if err != nil {
 		log.Fatal("init config error")
@@ -39,26 +41,33 @@ func init() {
 	log.Info("----------------------------------Init OK----------------------------------")
 }
 
-func settingUp() error {
+func settingUp() (chan interface{}, error) {
 	setting, err := setting.NewSetting()
 	if err != nil {
-		return err
+		return nil, err
 	}
 	err = setting.ReadSection("Server", &global.ServerSetting)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	err = setting.ReadSection("App", &global.AppSetting)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	err = setting.ReadSection("Database", &global.DataBaseSetting)
 	if err != nil {
-		return err
+		return nil, err
 	}
+
+	err = setting.ReadSection("Nacos", &global.NacosSetting)
+	if err != nil {
+		return nil, err
+	}
+
 	global.ServerSetting.ReadTimeout *= time.Second
 	global.ServerSetting.WriteTimeout *= time.Second
-	return nil
+
+	return setting.C, nil
 }
 
 func setUpDbEngine() error {
@@ -82,4 +91,13 @@ func setUpLog() {
 
 	// Only log the warning severity or above.
 	log.SetLevel(log.InfoLevel)
+}
+
+func SetUpNacos(c chan interface{}) {
+	_ = setting.NewNacos(c, global.NacosSetting.NamespaceId,
+		global.NacosSetting.Group,
+		global.NacosSetting.DataId,
+		global.NacosSetting.IpAddr,
+		global.NacosSetting.Port)
+	//global.Nacos = nacos
 }

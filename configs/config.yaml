@@ -1,8 +1,17 @@
 server:
+  AppName: blog-service-1
   RunMode: debug
   HttpPort: 8000
   ReadTimeout: 60
   WriteTimeout: 60
+
+Nacos:
+  IpAddr: 8.140.44.29
+  Port: 8848
+  NamespaceId: public
+  Group: DEFAULT_GROUP
+  DataId: blog-service
+
 
 App:
   DefaultPageSize: 10

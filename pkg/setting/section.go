@@ -3,6 +3,7 @@ package setting
 import "time"
 
 type ServerSettingS struct {
+	AppName      string
 	RunMode      string
 	HttpPort     string
 	ReadTimeout  time.Duration
@@ -33,4 +34,12 @@ type DataBaseSettingS struct {
 	ParseTime    bool
 	MaxIdleConns int
 	MaxOpenConns int
+}
+
+type NacosSettingS struct {
+	IpAddr      string
+	Port        uint64
+	NamespaceId string
+	Group       string
+	DataId      string
 }
