@@ -3,7 +3,6 @@ package routers
 import (
 	"blog-service/internal/middleware"
 	"blog-service/internal/routers/api"
-	nice "github.com/ekyoung/gin-nice-recovery"
 	"github.com/gin-gonic/gin"
 )
 
@@ -12,15 +11,15 @@ func NewRouter() *gin.Engine {
 
 	g.Use(gin.Logger())
 	g.Use(middleware.MiddleWare())
-	g.Use(nice.Recovery(recoveryHandler))
-
-	v1 := g.Group("/api/v1")
+	g.Use(middleware.Recovery())
+	//
+	orderGroup := g.Group("/sale")
 	{
-		tag := api.NewTag()
-		v1.GET("/tags", tag.List)
-		v1.POST("/tags", tag.Create)
-		v1.PUT("/tags/:id", tag.Update)
-		v1.DELETE("/tags/:id", tag.Delete)
+		order := api.NewOrder()
+		orderGroup.POST("/auto/order", order.DealAutoOrder)
+		//v1.POST("/tags", tag.Create)
+		//v1.PUT("/tags/:id", tag.Update)
+		//v1.DELETE("/tags/:id", tag.Delete)
 	}
 	return g
 }

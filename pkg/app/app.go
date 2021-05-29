@@ -48,4 +48,6 @@ func (r *Response) ToErrorResponse(err *errcode.Error) {
 		response["details"] = details
 	}
 	r.Ctx.JSON(err.StatusCode(), response)
+
+	return
 }
