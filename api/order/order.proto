@@ -2,6 +2,8 @@ syntax = "proto3";
 
 option go_package = "/api/order;opb";
 
+import "google/api/annotations.proto";
+
 package order;
 
 message OrderReq{
@@ -25,5 +27,10 @@ message OrderResultInfo{
 }
 
 service OrderService{
-  rpc AutoOrder(OrderReq) returns (OrderResp){}
+  rpc AutoOrder(OrderReq) returns (OrderResp){
+    option (google.api.http) = {
+      post: "/order/auto_order"
+      body: "*"
+    };
+  }
 }

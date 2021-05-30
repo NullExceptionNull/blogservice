@@ -1,8 +1,8 @@
 package routers
 
 import (
-	"blog-service/internal/middleware"
-	"blog-service/internal/routers/api"
+	middleware2 "blog-service/internal/order/middleware"
+	api2 "blog-service/internal/order/routers/api"
 	"github.com/gin-gonic/gin"
 )
 
@@ -10,12 +10,12 @@ func NewRouter() *gin.Engine {
 	g := gin.New()
 
 	g.Use(gin.Logger())
-	g.Use(middleware.MiddleWare())
-	g.Use(middleware.Recovery())
+	g.Use(middleware2.MiddleWare())
+	g.Use(middleware2.Recovery())
 	//
 	orderGroup := g.Group("/sale")
 	{
-		order := api.NewOrder()
+		order := api2.NewOrder()
 		orderGroup.POST("/auto/order", order.DealAutoOrder)
 		//v1.POST("/tags", tag.Create)
 		//v1.PUT("/tags/:id", tag.Update)

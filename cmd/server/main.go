@@ -2,8 +2,8 @@ package main
 
 import (
 	"blog-service/global"
-	"blog-service/internal/model"
-	"blog-service/internal/routers"
+	model2 "blog-service/internal/order/model"
+	routers2 "blog-service/internal/order/routers"
 	"blog-service/pkg/setting"
 	log "github.com/sirupsen/logrus"
 	"net/http"
@@ -12,7 +12,7 @@ import (
 )
 
 func main() {
-	engine := routers.NewRouter()
+	engine := routers2.NewRouter()
 
 	server := &http.Server{
 		Addr:              ":" + global.ServerSetting.HttpPort,
@@ -34,6 +34,8 @@ func init() {
 	err = setUpDbEngine()
 
 	SetUpNacos(c)
+
+	go StartAllGrpc()
 
 	if err != nil {
 		log.Fatal("init config error")
@@ -71,7 +73,7 @@ func settingUp() (chan interface{}, error) {
 }
 
 func setUpDbEngine() error {
-	db, err := model.NewEngine(global.DataBaseSetting)
+	db, err := model2.NewEngine(global.DataBaseSetting)
 	if err != nil {
 		panic(err)
 	}

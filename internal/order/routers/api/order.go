@@ -2,7 +2,8 @@ package api
 
 import (
 	opb "blog-service/api/order"
-	"blog-service/internal/service"
+	"blog-service/global"
+	"blog-service/internal/order/rpcservice/order"
 	"blog-service/pkg/app"
 	"blog-service/pkg/errcode"
 	"fmt"
@@ -10,7 +11,7 @@ import (
 )
 
 type Order struct {
-	srv service.Order
+	srv order.OrderServer
 }
 
 func NewOrder() *Order {
@@ -32,6 +33,17 @@ func (o *Order) DealAutoOrder(c *gin.Context) {
 		return
 	}
 	//检查Token
-	app.NewResponse(c).ToResponse(opb.OrderResp{})
+
+	client := global.OrderClient
+
+	autoOrder, err := client.AutoOrder(c, &orderParam)
+
+	if err != nil {
+		app.NewResponse(c).ToErrorResponse(errcode.InvalidParams)
+		return
+	}
+
+	app.NewResponse(c).ToResponse(autoOrder)
+
 	return
 }
