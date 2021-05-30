@@ -33,8 +33,7 @@ func (o *Order) DealAutoOrder(c *gin.Context) {
 		return
 	}
 	//检查Token
-
-	client := global.OrderClient
+	client := global.GetOrderClient()
 
 	autoOrder, err := client.AutoOrder(c, &orderParam)
 
@@ -42,8 +41,6 @@ func (o *Order) DealAutoOrder(c *gin.Context) {
 		app.NewResponse(c).ToErrorResponse(errcode.InvalidParams)
 		return
 	}
-
 	app.NewResponse(c).ToResponse(autoOrder)
-
 	return
 }

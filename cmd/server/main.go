@@ -52,6 +52,12 @@ func settingUp() (chan interface{}, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	err = setting.ReadSection("Host", &global.HostSettings)
+	if err != nil {
+		return nil, err
+	}
+
 	err = setting.ReadSection("App", &global.AppSetting)
 	if err != nil {
 		return nil, err
@@ -96,7 +102,7 @@ func setUpLog() {
 }
 
 func SetUpNacos(c chan interface{}) {
-	_ = setting.NewNacos(c, global.NacosSetting.NamespaceId,
+	_ = setting.NewConfigNacos(c, global.NacosSetting.NamespaceId,
 		global.NacosSetting.Group,
 		global.NacosSetting.DataId,
 		global.NacosSetting.IpAddr,

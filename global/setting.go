@@ -7,4 +7,5 @@ var (
 	AppSetting      *setting.AppSettingS
 	DataBaseSetting *setting.DataBaseSettingS
 	NacosSetting    *setting.NacosSettingS
+	HostSettings    *setting.HostSettings
 )

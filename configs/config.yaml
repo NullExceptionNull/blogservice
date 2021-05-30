@@ -31,3 +31,6 @@ Database:
   ParseTime: True
   MaxIdleConns: 10
   MaxOpenConns: 30
+
+Host:
+  OrderHost: localhost:8001

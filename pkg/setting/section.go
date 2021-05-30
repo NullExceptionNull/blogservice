@@ -1,6 +1,8 @@
 package setting
 
-import "time"
+import (
+	"time"
+)
 
 type ServerSettingS struct {
 	AppName      string
@@ -8,6 +10,10 @@ type ServerSettingS struct {
 	HttpPort     string
 	ReadTimeout  time.Duration
 	WriteTimeout time.Duration
+}
+
+type HostSettings struct {
+	OrderHost string
 }
 
 type AppSettingS struct {

@@ -3,19 +3,21 @@ package setting
 import (
 	"github.com/nacos-group/nacos-sdk-go/clients"
 	"github.com/nacos-group/nacos-sdk-go/clients/config_client"
+	"github.com/nacos-group/nacos-sdk-go/clients/naming_client"
 	"github.com/nacos-group/nacos-sdk-go/common/constant"
 	"github.com/nacos-group/nacos-sdk-go/vo"
 	"github.com/sirupsen/logrus"
 )
 
 type Nacos struct {
-	Client      config_client.IConfigClient
-	NamespaceId string
-	Group       string
-	DataId      string
+	ConfigClient config_client.IConfigClient
+	NamingClient naming_client.INamingClient
+	NamespaceId  string
+	Group        string
+	DataId       string
 }
 
-func NewNacos(c chan interface{}, NamespaceId string, Group string, DataId string, IpAddr string, port uint64) *Nacos {
+func NewConfigNacos(c chan interface{}, NamespaceId string, Group string, DataId string, IpAddr string, port uint64) *Nacos {
 	sc := []constant.ServerConfig{
 		{
 			IpAddr: IpAddr,
@@ -23,31 +25,32 @@ func NewNacos(c chan interface{}, NamespaceId string, Group string, DataId strin
 		},
 	}
 
-	cc := constant.ClientConfig{
-		NamespaceId:         NamespaceId, //namespace id
-		TimeoutMs:           5000,
-		NotLoadCacheAtStart: true,
-		LogDir:              "/tmp/nacos/log",
-		CacheDir:            "/tmp/nacos/cache",
-		RotateTime:          "1h",
-		MaxAge:              3,
-		LogLevel:            "debug",
-	}
-	client, err := clients.NewConfigClient(
+	cc := newClientConfig(NamespaceId)
+
+	configClient, err := clients.NewConfigClient(
 		vo.NacosClientParam{
 			ClientConfig:  &cc,
 			ServerConfigs: sc,
 		},
 	)
+
+	namingClient, err := clients.NewNamingClient(
+		vo.NacosClientParam{
+			ClientConfig:  &cc,
+			ServerConfigs: sc,
+		},
+	)
+
 	if err != nil {
 		panic(err)
 	}
 
 	nacos := &Nacos{
-		Client:      client,
-		NamespaceId: NamespaceId,
-		Group:       Group,
-		DataId:      DataId,
+		ConfigClient: configClient,
+		NamingClient: namingClient,
+		NamespaceId:  NamespaceId,
+		Group:        Group,
+		DataId:       DataId,
 	}
 	go func() {
 		nacos.Refresh(c)
@@ -60,8 +63,22 @@ func NewNacos(c chan interface{}, NamespaceId string, Group string, DataId strin
 	return nacos
 }
 
+func newClientConfig(NamespaceId string) constant.ClientConfig {
+	cc := constant.ClientConfig{
+		NamespaceId:         NamespaceId, //namespace id
+		TimeoutMs:           5000,
+		NotLoadCacheAtStart: true,
+		LogDir:              "/tmp/nacos/log",
+		CacheDir:            "/tmp/nacos/cache",
+		RotateTime:          "1h",
+		MaxAge:              3,
+		LogLevel:            "debug",
+	}
+	return cc
+}
+
 func (n *Nacos) Refresh(c chan interface{}) {
-	_ = n.Client.ListenConfig(vo.ConfigParam{
+	_ = n.ConfigClient.ListenConfig(vo.ConfigParam{
 		DataId: n.DataId,
 		Group:  n.Group,
 		OnChange: func(namespace, group, dataId, data string) {
@@ -72,7 +89,7 @@ func (n *Nacos) Refresh(c chan interface{}) {
 }
 
 func (n *Nacos) GetConfig() string {
-	config, err := n.Client.GetConfig(vo.ConfigParam{
+	config, err := n.ConfigClient.GetConfig(vo.ConfigParam{
 		DataId: n.DataId,
 		Group:  n.Group,
 	})
@@ -80,4 +97,8 @@ func (n *Nacos) GetConfig() string {
 		panic(err)
 	}
 	return config
+}
+
+func (n *Nacos) RegisterServiceInstance(param vo.RegisterInstanceParam) (bool, error) {
+	return n.NamingClient.RegisterInstance(param)
 }
