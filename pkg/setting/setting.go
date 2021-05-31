@@ -57,7 +57,7 @@ func (s *Setting) reload() {
 		case <-s.C:
 			logrus.Info("Config is refreshing")
 			s.ReLoadSection()
-		case <-time.Tick(30 * time.Second):
+		case <-time.Tick(1 * time.Minute):
 			logrus.Info("The setting reload goroutine is running ")
 		}
 	}
